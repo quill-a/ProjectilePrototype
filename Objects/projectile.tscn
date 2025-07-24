@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://dy43uovl3v0e5"]
+
+[ext_resource type="Script" uid="uid://del5pr7ydwh5g" path="res://Objects/Projectile.cs" id="1_u7ffc"]
+[ext_resource type="Texture2D" uid="uid://g0f5nwvilhld" path="res://icon.svg" id="2_gh6rp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1trb0"]
+
+[node name="Projectile" type="RigidBody2D"]
+script = ExtResource("1_u7ffc")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_gh6rp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1trb0")
