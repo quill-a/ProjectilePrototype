@@ -46,8 +46,14 @@ public partial class ProjectileLauncher : Node2D
 	private void ShootProjectile(PackedScene projectileToShoot)
 	{
 		var projectileInstance = projectileToShoot?.Instantiate<Objects.Projectile>();
-		_projectilesParent.AddChild(projectileInstance);
-		if (projectileInstance != null) projectileInstance.GlobalPosition = GlobalPosition;
+
+		// Only want to add a projectile or set its global position if it's not null.
+		if (projectileInstance != null)
+		{
+			_projectilesParent.AddChild(projectileInstance);
+			projectileInstance.GlobalPosition = GlobalPosition;
+		}
+		
 		Vector2 launchVector = _aimDirection * LaunchPower;
 		projectileInstance?.ApplyForce(launchVector);
 	}
