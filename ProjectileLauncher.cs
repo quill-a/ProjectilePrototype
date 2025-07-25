@@ -4,7 +4,7 @@ namespace ProjectilePrototypeCS;
 
 public partial class ProjectileLauncher : Node2D
 {
-	
+	// *** Properties ***
 	[Export] public Node2D Aiming { get; private set; }
 
 	[Export] public PackedScene ProjectileScene { get; private set; }
@@ -13,34 +13,73 @@ public partial class ProjectileLauncher : Node2D
 
 	[Export] public StringName ProjectilesParentGroup { get; private set; } = "ProjectilesParent";
 	
-	[Export] public float LaunchPower { get; set; } = 20000f;
+	[Export] public float LaunchPower { get; set; } = 30000f;
 	
-	// Private Fields
+	[Export] public Sprite2D Sprite {get; private set;}
+
+	/// <summary>
+	/// Multiply this by the Launch Power to get the bonus power
+	/// that is added to the projectile at launch-time.
+	/// </summary>
+	[Export] public float TimePowerMultiplier { get; set; } = 0.5f;
+
+	private bool IsCharging
+	{
+		get => _isCharging;
+		set
+		{
+			_isCharging = value;
+
+			if (!_isCharging) _chargeTime = 0.0f;
+		}
+	}
+	
+	// *** Fields ***
 	private Node _projectilesParent;
 	private Vector2 _aimDirection;
-
-// Called when the node enters the scene tree for the first time.
+	private bool _isCharging;
+	private float _chargeTime;
+	
+	// *** Methods ***
+	//
+	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		_projectilesParent = GetTree().GetFirstNodeInGroup(ProjectilesParentGroup);
 		
 		if(_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
+		
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		// Determines what direction to aim.
 		Vector2 mousePosition = GetGlobalMousePosition();
 		_aimDirection = GlobalPosition.DirectionTo(mousePosition);
 		if (Aiming != null) Aiming.Rotation = GetAngleTo(mousePosition);
+
+		if (_isCharging)
+		{
+			_chargeTime += (float) delta;
+		}
 	}
 
 	public override void _Input(InputEvent @event)
 	{
 		if(@event.IsActionPressed(ShootAction))
 		{
+			ChargeProjectile();
+		}
+		else if(@event.IsActionReleased(ShootAction))
+		{
 			ShootProjectile(ProjectileScene);
 		}
+	}
+
+	public void ChargeProjectile()
+	{
+		IsCharging = true;
 	}
 
 	private void ShootProjectile(PackedScene projectileToShoot)
@@ -54,7 +93,16 @@ public partial class ProjectileLauncher : Node2D
 			projectileInstance.GlobalPosition = GlobalPosition;
 		}
 		
-		Vector2 launchVector = _aimDirection * LaunchPower;
+		// Limit charge time to 3 seconds.
+		if(_chargeTime > 3.0f) _chargeTime = 3.0f;
+		
+		// Calculate power and launch projectile.
+		float finalPower = LaunchPower + (LaunchPower * _chargeTime * TimePowerMultiplier);
+		Vector2 launchVector = _aimDirection * finalPower;
 		projectileInstance?.ApplyForce(launchVector);
+		
+		// Don't want the launcher to keep charging after the action button has been released.
+		// Also, if projectile is launched, then time charged should implicitly reset to 0 seconds for the next event.
+		IsCharging = false;
 	}
 }
