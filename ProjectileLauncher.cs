@@ -4,6 +4,9 @@ namespace ProjectilePrototypeCS;
 
 public partial class ProjectileLauncher : Node2D
 {
+	// *** Delegates ***
+	[Signal] public delegate void PowerChangedEventHandler(float launchPower);
+	
 	// *** Properties ***
 	[Export] public Node2D Aiming { get; private set; }
 
@@ -13,7 +16,7 @@ public partial class ProjectileLauncher : Node2D
 
 	[Export] public StringName ProjectilesParentGroup { get; private set; } = "ProjectilesParent";
 	
-	[Export] public float LaunchPower { get; set; } = 30000f;
+	[Export] public float BasePower { get; set; } = 30000f;
 	
 	[Export] public Sprite2D Sprite {get; private set;}
 
@@ -23,14 +26,42 @@ public partial class ProjectileLauncher : Node2D
 	/// </summary>
 	[Export] public float TimePowerMultiplier { get; set; } = 0.5f;
 
-	private bool IsCharging
+	public float LaunchPower
+	{
+		get => _launchPower;
+		set
+		{
+			_launchPower = value;
+			EmitSignal("PowerChanged", _launchPower);
+		}
+	}
+
+	public bool IsCharging
 	{
 		get => _isCharging;
 		set
 		{
 			_isCharging = value;
 
-			if (!_isCharging) _chargeTime = 0.0f;
+			if (!_isCharging) ChargeTime = 0.0f;
+		}
+	}
+
+	public float ChargeTime
+	{
+		get => _chargeTime;
+		set
+		{
+			_chargeTime = value;
+			
+			// Progressively change color of the launcher as the action button stays pressed.
+			if (Sprite != null) Sprite.SelfModulate = new Color(
+				1f,
+				1f - (_chargeTime / MaxChargeTime),
+				1f - (_chargeTime / MaxChargeTime)
+			);
+			
+			LaunchPower = BasePower + (BasePower * _chargeTime * TimePowerMultiplier);
 		}
 	}
 	
@@ -41,6 +72,7 @@ public partial class ProjectileLauncher : Node2D
 	private bool _isCharging;
 	private float _chargeTime;
 	private Color _defaultSpriteColor;
+	private float _launchPower;
 	
 	private const float MaxChargeTime = 3.0f; // Limit charge time to 3 seconds.
 	
@@ -50,10 +82,11 @@ public partial class ProjectileLauncher : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		SetDeferred("LaunchPower", BasePower);
 		_projectilesParent = GetTree().GetFirstNodeInGroup(ProjectilesParentGroup);
-		
 		if (_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
 
+		// Reset/initialize values on-ready.
 		if (Sprite != null) _defaultSpriteColor = Sprite.Modulate;
 	}
 
@@ -64,17 +97,10 @@ public partial class ProjectileLauncher : Node2D
 		Vector2 mousePosition = GetGlobalMousePosition();
 		_aimDirection = GlobalPosition.DirectionTo(mousePosition);
 		if (Aiming != null) Aiming.Rotation = GetAngleTo(mousePosition);
-
-		if (_isCharging)
+		
+		if (_isCharging && ChargeTime < MaxChargeTime)
 		{
-			_chargeTime += (float) delta;
-			
-			// Progressively change color of the launcher as the action button stays pressed.
-			if (Sprite != null) Sprite.SelfModulate = new Color(
-				1f,
-				1f - (_chargeTime / MaxChargeTime),
-				1f - (_chargeTime / MaxChargeTime)
-				);
+			ChargeTime += (float) delta;
 		}
 	}
 
@@ -106,18 +132,13 @@ public partial class ProjectileLauncher : Node2D
 			projectileInstance.GlobalPosition = GlobalPosition;
 		}
 		
-		// Limit charge time.
-		if (_chargeTime > MaxChargeTime) _chargeTime = MaxChargeTime;
-		
 		// Calculate power and launch projectile.
-		float finalPower = LaunchPower + (LaunchPower * _chargeTime * TimePowerMultiplier);
-		Vector2 launchVector = _aimDirection * finalPower;
+		var launchVector = _aimDirection * LaunchPower;
 		projectileInstance?.ApplyForce(launchVector);
 		
 		// Don't want the launcher to keep charging after the action button has been released.
 		// Also, if projectile is launched, then time charged should implicitly reset to 0 seconds for the next event.
 		IsCharging = false;
-		
 		if (Sprite != null) Sprite.SelfModulate = _defaultSpriteColor;
 	}
 }
