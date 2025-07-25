@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://dfggq4vno4qeg"]
+[gd_scene load_steps=8 format=3 uid="uid://dfggq4vno4qeg"]
 
 [ext_resource type="Script" uid="uid://cydsjynq2loop" path="res://ProjectileLauncher.cs" id="1_fj7yv"]
 [ext_resource type="Texture2D" uid="uid://cdpbosatlw8gl" path="res://Art/deep_fold/space_background.png" id="2_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bquwbx7q0c2kh" path="res://Objects/projectile_launcher.tscn" id="2_tlwt5"]
 [ext_resource type="Texture2D" uid="uid://g0f5nwvilhld" path="res://icon.svg" id="3_tlwt5"]
+[ext_resource type="PackedScene" uid="uid://b74fhr2f2yjd7" path="res://Gameplay/score_box.tscn" id="5_036b0"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aqk2v"]
 texture = ExtResource("3_tlwt5")
@@ -40,3 +41,7 @@ format = 2
 layer_0/tile_data = PackedInt32Array(-65536, 0, 0, -65535, 0, 0, -65534, 0, 0, -65533, 0, 0, -65532, 0, 0, -65531, 0, 0, -65530, 0, 0, -65529, 0, 0, -65528, 0, 0, -131072, 0, 0, -131071, 0, 0, -131070, 0, 0, -131069, 0, 0, -131068, 0, 0, -131067, 0, 0, -131066, 0, 0, -131065, 0, 0, -131064, 0, 0, -131063, 0, 0, -131062, 0, 0, -131061, 0, 0, -65525, 0, 0, -65526, 0, 0, -65527, 0, 0)
 
 [node name="Projectiles" type="Node2D" parent="." groups=["ProjectilesParent"]]
+
+[node name="ScoreBox" parent="." instance=ExtResource("5_036b0")]
+position = Vector2(1130, -820)
+scale = Vector2(1.78438, 2.08826)
