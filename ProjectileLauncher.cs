@@ -34,11 +34,16 @@ public partial class ProjectileLauncher : Node2D
 		}
 	}
 	
+	
 	// *** Fields ***
 	private Node _projectilesParent;
 	private Vector2 _aimDirection;
 	private bool _isCharging;
 	private float _chargeTime;
+	private Color _defaultSpriteColor;
+	
+	private const float MaxChargeTime = 3.0f; // Limit charge time to 3 seconds.
+	
 	
 	// *** Methods ***
 	//
@@ -48,7 +53,8 @@ public partial class ProjectileLauncher : Node2D
 		_projectilesParent = GetTree().GetFirstNodeInGroup(ProjectilesParentGroup);
 		
 		if(_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
-		
+
+		_defaultSpriteColor = Sprite.Modulate;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -62,6 +68,13 @@ public partial class ProjectileLauncher : Node2D
 		if (_isCharging)
 		{
 			_chargeTime += (float) delta;
+			
+			// Progressively change color of the launcher as the action button stays pressed.
+			Sprite.SelfModulate = new Color(
+				1f,
+				1f - (_chargeTime / MaxChargeTime),
+				1f - (_chargeTime / MaxChargeTime)
+				);
 		}
 	}
 
@@ -77,7 +90,7 @@ public partial class ProjectileLauncher : Node2D
 		}
 	}
 
-	public void ChargeProjectile()
+	private void ChargeProjectile()
 	{
 		IsCharging = true;
 	}
@@ -93,8 +106,8 @@ public partial class ProjectileLauncher : Node2D
 			projectileInstance.GlobalPosition = GlobalPosition;
 		}
 		
-		// Limit charge time to 3 seconds.
-		if(_chargeTime > 3.0f) _chargeTime = 3.0f;
+		// Limit charge time.
+		if(_chargeTime > MaxChargeTime) _chargeTime = MaxChargeTime;
 		
 		// Calculate power and launch projectile.
 		float finalPower = LaunchPower + (LaunchPower * _chargeTime * TimePowerMultiplier);
@@ -104,5 +117,7 @@ public partial class ProjectileLauncher : Node2D
 		// Don't want the launcher to keep charging after the action button has been released.
 		// Also, if projectile is launched, then time charged should implicitly reset to 0 seconds for the next event.
 		IsCharging = false;
+		
+		Sprite.SelfModulate = _defaultSpriteColor;
 	}
 }
