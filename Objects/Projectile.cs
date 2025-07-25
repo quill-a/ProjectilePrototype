@@ -4,13 +4,24 @@ namespace ProjectilePrototypeCS.Objects;
 
 public partial class Projectile : RigidBody2D
 {
+	// *** Properties ***
+	[Export] public float TimeToLive { get; private set; } = 3f;
+	
+	// *** Fields ***
+	private Timer _freeTimer;
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_freeTimer = new Timer();
+		AddChild(_freeTimer);
+		_freeTimer.WaitTime = TimeToLive;
+		_freeTimer.Timeout += OnTimeout;
+		_freeTimer.Start();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	public void OnTimeout()
 	{
+		QueueFree();
 	}
 }

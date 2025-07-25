@@ -1,4 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://b74fhr2f2yjd7"]
+[gd_scene load_steps=9 format=3 uid="uid://b74fhr2f2yjd7"]
+
+[ext_resource type="Script" uid="uid://h0r62lb6qjoj" path="res://Gameplay/ScoreBox.cs" id="1_poiat"]
+[ext_resource type="Resource" uid="uid://s2jpb1hleoiy" path="res://Data/score.tres" id="2_h80od"]
 
 [sub_resource type="Gradient" id="Gradient_mxl0a"]
 offsets = PackedFloat32Array(0.327616, 0.581475, 0.605489)
@@ -13,6 +16,21 @@ fill_from = Vector2(0.482906, 0.487179)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_h80od"]
 radius = 52.6118
+
+[sub_resource type="Animation" id="Animation_poiat"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Position:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_mxl0a"]
 resource_name = "patrol"
@@ -31,28 +49,16 @@ tracks/0/keys = {
 "values": [Vector2(0, 0), Vector2(-200, 0), Vector2(-200, 100), Vector2(0, 100), Vector2(0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_poiat"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Position:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_h80od"]
 _data = {
 &"RESET": SubResource("Animation_poiat"),
 &"patrol": SubResource("Animation_mxl0a")
 }
 
-[node name="ScoreBox" type="Node2D"]
+[node name="ScoreBox" type="Node2D" node_paths=PackedStringArray("ScoreArea")]
+script = ExtResource("1_poiat")
+ScoreArea = NodePath("Position/Area2D")
+Score = ExtResource("2_h80od")
 
 [node name="Position" type="Node2D" parent="."]
 

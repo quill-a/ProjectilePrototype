@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://s2jpb1hleoiy"]
+
+[ext_resource type="Script" uid="uid://depj1xaa4n4mf" path="res://Data/Score.cs" id="1_ymgje"]
+
+[resource]
+script = ExtResource("1_ymgje")
+Value = 0

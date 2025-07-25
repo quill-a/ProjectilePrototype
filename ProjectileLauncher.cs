@@ -24,7 +24,7 @@ public partial class ProjectileLauncher : Node2D
 	/// Multiply this by the Launch Power to get the bonus power
 	/// that is added to the projectile at launch-time.
 	/// </summary>
-	[Export] public float TimePowerMultiplier { get; set; } = 0.5f;
+	[Export] public float TimePowerMultiplier { get; set; } = 1.25f;
 
 	public float LaunchPower
 	{
@@ -82,7 +82,9 @@ public partial class ProjectileLauncher : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		// Loads the base power level into the UI so that it isn't blank upon load.
 		SetDeferred("LaunchPower", BasePower);
+		
 		_projectilesParent = GetTree().GetFirstNodeInGroup(ProjectilesParentGroup);
 		if (_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
 
