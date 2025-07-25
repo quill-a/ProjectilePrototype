@@ -52,9 +52,9 @@ public partial class ProjectileLauncher : Node2D
 	{
 		_projectilesParent = GetTree().GetFirstNodeInGroup(ProjectilesParentGroup);
 		
-		if(_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
+		if (_projectilesParent == null) GD.PushWarning("No projectiles parent found in projectiles group " + ProjectilesParentGroup);
 
-		_defaultSpriteColor = Sprite.Modulate;
+		if (Sprite != null) _defaultSpriteColor = Sprite.Modulate;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -70,7 +70,7 @@ public partial class ProjectileLauncher : Node2D
 			_chargeTime += (float) delta;
 			
 			// Progressively change color of the launcher as the action button stays pressed.
-			Sprite.SelfModulate = new Color(
+			if (Sprite != null) Sprite.SelfModulate = new Color(
 				1f,
 				1f - (_chargeTime / MaxChargeTime),
 				1f - (_chargeTime / MaxChargeTime)
@@ -80,11 +80,11 @@ public partial class ProjectileLauncher : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
-		if(@event.IsActionPressed(ShootAction))
+		if (@event.IsActionPressed(ShootAction))
 		{
 			ChargeProjectile();
 		}
-		else if(@event.IsActionReleased(ShootAction))
+		else if (@event.IsActionReleased(ShootAction))
 		{
 			ShootProjectile(ProjectileScene);
 		}
@@ -107,7 +107,7 @@ public partial class ProjectileLauncher : Node2D
 		}
 		
 		// Limit charge time.
-		if(_chargeTime > MaxChargeTime) _chargeTime = MaxChargeTime;
+		if (_chargeTime > MaxChargeTime) _chargeTime = MaxChargeTime;
 		
 		// Calculate power and launch projectile.
 		float finalPower = LaunchPower + (LaunchPower * _chargeTime * TimePowerMultiplier);
@@ -118,6 +118,6 @@ public partial class ProjectileLauncher : Node2D
 		// Also, if projectile is launched, then time charged should implicitly reset to 0 seconds for the next event.
 		IsCharging = false;
 		
-		Sprite.SelfModulate = _defaultSpriteColor;
+		if (Sprite != null) Sprite.SelfModulate = _defaultSpriteColor;
 	}
 }

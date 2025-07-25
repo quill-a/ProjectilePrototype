@@ -17,10 +17,11 @@ Sprite = NodePath("Aiming/Sprite2D")
 rotation = 1.5708
 texture = ExtResource("1_ctoep")
 
-[node name="PowerLabel" type="Label" parent="."]
+[node name="PowerLabel" type="Label" parent="." node_paths=PackedStringArray("Launcher")]
 offset_left = -54.0
 offset_top = -111.0
 offset_right = 8.0
 offset_bottom = -88.0
 text = "POWER:"
 script = ExtResource("4_rlku3")
+Launcher = NodePath("..")
